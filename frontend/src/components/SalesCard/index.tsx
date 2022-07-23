@@ -7,16 +7,24 @@ import axios from "axios";
 import { BASE_URL } from "../../utils/request";
 import { Sale } from "../../models/sale";
 function SalesCard() {
-    const [minDate, setMindate] = useState(new Date());
-    const [MaxDate, setMaxDate] = useState(new Date());
+
+    const min = new Date(new Date().setDate(new Date().getDate() - 365))
+    const max = new Date();
+
+    const [minDate, setMindate] = useState(min);
+    const [maxDate, setMaxDate] = useState(max);
 
     const [sales, setSales] = useState<Sale[]>([])
 
     useEffect(() => {
-        axios.get(`${BASE_URL}/sales`).then(response => {
+
+        const dmin = minDate.toISOString().slice(0, 10);
+        const dmax = maxDate.toISOString().slice(0, 10);
+        
+        axios.get(`${BASE_URL}/sales?minDate=${dmin}&maxDate=${dmax}`).then(response => {
             setSales(response.data.content)
         })
-    }, [])
+    }, [minDate, maxDate])
 
 
 
@@ -34,7 +42,7 @@ function SalesCard() {
                 </div>
                 <div className="dsmeta-form-control-container">
                     <DatePicker
-                        selected={MaxDate}
+                        selected={maxDate}
                         onChange={(date: Date) => setMaxDate(date)}
                         className="dsmeta-form-control"
                         dateFormat="dd/MM/yyyy"
